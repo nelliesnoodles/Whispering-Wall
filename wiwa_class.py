@@ -49,6 +49,7 @@ class Wiwa(object):
         print(intro)
         make = input("..>>")
         while make not in ['EXIT', 'QUIT']:
+
             choice = self.pick_response(make)
             #print(choice)
             question = self.check_question(make)
@@ -77,10 +78,13 @@ class Wiwa(object):
                     print("Wiwa:")
                     print(f"I wish I could do it {choice[1]}")
                 else:
-                    print("Wiwa: I do not comprehend")
+
+                    print("Wiwa:  ... ... ")
             make = input("...>>")
 
     def get_script_line(self, arg):
+        """ Chooses a random script line to give back to user """
+        # is often not random *sad face*
         with open(arg) as f:
             for i, l in enumerate(f):
                 pass
@@ -92,6 +96,8 @@ class Wiwa(object):
                 return lines[x]
 
     def pick_response(self, raw_input):
+        """ Create lists of possible valid words for response mechanism,
+            Then uses random to choose one to send back to run_wiwa() """
         make = raw_input.lower()
         nouns, verbs, adj, adv, errors = self.make_tag_lists(make)
         n = len(nouns)
@@ -105,7 +111,6 @@ class Wiwa(object):
             words_found = True
             for item in nouns:
                 options['noun'].append(item)
-
         if v > 0:
             words_found = True
             for item in verbs:
@@ -158,21 +163,22 @@ class Wiwa(object):
         return new_arg
 
     def make_tag_lists(self, arg):
-    #With string as arg, return lists of Adj, adv, noun, verb
-    #    Empty lists mean no found type-noun(verb, adv, adj)
+        """ Use nltk to tag words for Wiwa to recycle and or respond too """
+        # Now that this is working I'll have to make her an adjective and adverb script!
         errors = self.check_errors(arg)
         tokens = nltk.word_tokenize(arg)
         tags = nltk.pos_tag(tokens)
-        print(tags)
+        clean_tags = self.remove_bad_tags(tags)
+        #print("cleaned tags=", clean_tags)
         nouns = []
         verbs = []
         adj = []
         adv = []
         errors = []
-        for item in tags:
+        for item in clean_tags:
             x = item[1]
             #print(item)
-            if x == ("VB"):
+            if x.startswith("VB"):
                 verbs.append(item[0])
             elif x.startswith("NN"):
                 nouns.append(item[0])
@@ -189,6 +195,7 @@ class Wiwa(object):
         return nouns, verbs, adj, adv, errors
 
     def check_errors(self, arg):
+        """ Make a list of words that are not found with pyEnchant"""
         errors = []
         for item in arg:
             if self.enchant_check(arg):
@@ -197,6 +204,20 @@ class Wiwa(object):
                 errors.append(item)
         return errors
 
+
+    def remove_bad_tags(self, tags_list):
+        """ Use pyEnchant to remove unidentifiable words from tags list"""
+        new_tags = []
+        for item in tags_list:
+            word = item[0]
+
+            if self.enchant_check(word):
+                new_tags.append(item)
+            else:
+                pass
+                #print("word is not found:", word)
+
+        return new_tags
 
     def enchant_check(self, arg):
         """ using the PyEnchant English dictionary to check validity of a word."""
