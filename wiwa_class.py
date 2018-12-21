@@ -24,7 +24,8 @@ import random
       noun responses -- requires script1 as sys.argv
       verb responses -- requires script2 as sys.argv
       yes responses -- requires script3
-    questionable -- script4
+      questionable -- script4
+      adjectives -- script5
 """
 
 
@@ -37,11 +38,13 @@ class Wiwa(object):
         self.verbscript = sys.argv[2]
         self.simplescript = sys.argv[3]
         self.questionable = sys.argv[4]
+        self.adjectives = sys.argv[5]
         self.dictionary = enchant.Dict("en_US")
         self.noun_script_order = create_script_line_order(self.nounscript)
         self.verb_script_order = create_script_line_order(self.verbscript)
         self.simple_script_order = create_script_line_order(self.simplescript)
         self.question_script_order = create_script_line_order(self.questionable)
+        self.adj_script_order = create_script_line_order(self.adjectives)
         self.line_get = 0
 
     def test_variables(self):
@@ -50,6 +53,9 @@ class Wiwa(object):
         print(self.verb_script_order)
         print(self.simple_script_order)
         print(self.question_script_order)
+        print(self.adj_script_order)
+        print("line_get, integer:")
+        print(self.line_get)
 
     def run_wiwa(self):
         intro = """ Welcome to the whispering wall, Wiwa is here to respond
@@ -84,10 +90,14 @@ class Wiwa(object):
                     print(response % choice[1])
                 elif choice[0] == 'adv':
                     print("Wiwa:")
-                    print(f"Is being {choice[1]} a good thing?")
+                    print(f"Can a turtle swim {choice[1]}?")
                 elif choice[0] == 'adj':
+                    response = self.get_script_line(self.adjectives)
                     print("Wiwa:")
-                    print(f"I wish I could do it {choice[1]}")
+                    if '%' in response:
+                        print(response % choice[1])
+                    else:
+                        print(response)
                 else:
 
                     print("Wiwa:  ... ... ")
@@ -107,6 +117,8 @@ class Wiwa(object):
             order = self.verb_script_order
         elif arg == 'script3.txt':
             order = self.simple_script_order
+        elif arg == 'script5.txt':
+            order = self.adj_script_order
         else:
             order = None
         if order != None:
