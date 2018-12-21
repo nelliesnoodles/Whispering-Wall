@@ -4,7 +4,6 @@ import sys
 import re
 import enchant
 from nltk.corpus import wordnet
-from random import randint
 import nltk as nltk
 import random
 
@@ -39,6 +38,18 @@ class Wiwa(object):
         self.simplescript = sys.argv[3]
         self.questionable = sys.argv[4]
         self.dictionary = enchant.Dict("en_US")
+        self.noun_script_order = create_script_line_order(self.nounscript)
+        self.verb_script_order = create_script_line_order(self.verbscript)
+        self.simple_script_order = create_script_line_order(self.simplescript)
+        self.question_script_order = create_script_line_order(self.questionable)
+        self.line_get = 0
+
+    def test_variables(self):
+        print("collection of script orders:")
+        print(self.noun_script_order)
+        print(self.verb_script_order)
+        print(self.simple_script_order)
+        print(self.question_script_order)
 
     def run_wiwa(self):
         intro = """ Welcome to the whispering wall, Wiwa is here to respond
@@ -82,18 +93,35 @@ class Wiwa(object):
                     print("Wiwa:  ... ... ")
             make = input("...>>")
 
+
     def get_script_line(self, arg):
         """ Chooses a random script line to give back to user """
         # is often not random *sad face*
-        with open(arg) as f:
-            for i, l in enumerate(f):
-                pass
-            count = i
-        if count != None:
+        #print(self.line_get)
+
+        if arg == 'script1.txt':
+            order = self.noun_script_order
+        elif arg == 'script4.txt':
+            order = self.question_script_order
+        elif arg == 'script2.txt':
+            order = self.verb_script_order
+        elif arg == 'script3.txt':
+            order = self.simple_script_order
+        else:
+            order = None
+        if order != None:
+            if self.line_get >= len(order):
+                self.line_get = 0
+            get_line = order[self.line_get]
             with open(arg) as f:
                 lines = f.readlines()
-                x = randint(0, count)
+                x = int(get_line)
+                #print(lines[x])
+                self.line_get += 1
                 return lines[x]
+
+        else:
+            return "script file could not be found"
 
     def pick_response(self, raw_input):
         """ Create lists of possible valid words for response mechanism,
@@ -231,6 +259,34 @@ class Wiwa(object):
         else:
             return False
 
+
+def create_script_line_order(somescript):
+    """ make a list with randomized order of line numbers from script
+        not sure if this is worth all the work yet. Must be a better way."""
+    # get count:
+    count = None
+    #print(somescript)
+    if somescript.endswith('.txt'):
+        try:
+            with open(somescript) as f:
+                for i, l in enumerate(f):
+                    pass
+                    count = i
+        except:
+            print("file is Empty.")
+            raise ValueError
+    else:
+        print("***file is not a txt file***")
+        print("\t file=", somefile)
+        raise ValueError
+    if count != None:
+        first_list = []
+        # create a list with all line numbers in it
+        for x in range(1, i):
+            first_list.append(x)
+        # shuffle those items:
+        random.shuffle(first_list)
+    return first_list
 
 
 
