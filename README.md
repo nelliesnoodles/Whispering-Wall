@@ -9,8 +9,11 @@ A setup.py file, If you already have python3.6 and your virtual environment acti
 
 TO-DO  
 
-* eliminate need for sys.argv when getting script.txt
-* create adjective and adverb and Interjections scripts
+* eliminate need for sys.argv when getting script.txt (Done. 2-11-19)
+* create adjective and adverb and Interjections scripts (adjectives done, adverbs done 2-11-19)
 * Find out if it's legal to use a Monty Python script to return a line when Wiwa has no answer
 * modify, fix, maintain, improve
 
+New TO-DO's:
+* create a test file to run before Whispering wall runs.  If tests fail, she doesn't run.
+* include with test file, custom messages for what went wrong during tests
