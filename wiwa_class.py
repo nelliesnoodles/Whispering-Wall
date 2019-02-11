@@ -6,6 +6,7 @@ import enchant
 from nltk.corpus import wordnet
 import nltk as nltk
 import random
+import os
 
 
 
@@ -21,11 +22,7 @@ import random
       >>>nltk.download('wordnet')
       >>>nltk.download('punkt')
       >>>nltk.download('averaged_perceptron_tagger')
-      noun responses -- requires script1 as sys.argv
-      verb responses -- requires script2 as sys.argv
-      yes responses -- requires script3
-      questionable -- script4
-      adjectives -- script5
+      Scripts for responses should be in same directory as wiwa_class.py
 """
 
 
@@ -34,28 +31,57 @@ import random
 
 class Wiwa(object):
     def __init__(self):
-        self.nounscript = sys.argv[1]
-        self.verbscript = sys.argv[2]
-        self.simplescript = sys.argv[3]
-        self.questionable = sys.argv[4]
-        self.adjectives = sys.argv[5]
+        self.fileDirectory = os.path.realpath(
+    os.path.join(os.getcwd(), os.path.dirname(__file__)))
+        self.nounscript = os.path.join(self.fileDirectory, 'script1.txt')
+        self.verbscript = os.path.join(self.fileDirectory, 'script2.txt')
+        self.simplescript = os.path.join(self.fileDirectory, 'script3.txt')
+        self.questionable = os.path.join(self.fileDirectory, 'script4.txt')
+        self.adjectives = os.path.join(self.fileDirectory, 'script5.txt')
+        self.adverbs = os.path.join(self.fileDirectory, 'script7.txt')
         self.dictionary = enchant.Dict("en_US")
         self.noun_script_order = create_script_line_order(self.nounscript)
         self.verb_script_order = create_script_line_order(self.verbscript)
         self.simple_script_order = create_script_line_order(self.simplescript)
         self.question_script_order = create_script_line_order(self.questionable)
         self.adj_script_order = create_script_line_order(self.adjectives)
+        self.adv_script_order = create_script_line_order(self.adverbs)
+        self.scripts_list = [self.nounscript, self.verbscript, self.simplescript, self.questionable, self.adjectives, self.adverbs]
         self.line_get = 0
+
+    def test_filePath(self):
+        #files_list = [self.nounscript, self.verbscript, self.simplescript, self.questionable, self.adjectives, self.adverbs]
+        for script in self.scripts_list:
+            try:
+                with open(script) as f:
+                    printable = str(script)
+                    print(printable)
+                    print("SUCCESS")
+            except Exception as e:
+                print(e)
 
     def test_variables(self):
         print("collection of script orders:")
+        print("--------- nouns ---------")
         print(self.noun_script_order)
+        print("--------- verbs ---------")
         print(self.verb_script_order)
+        print("---------simple----------")
         print(self.simple_script_order)
+        print("--------questions--------")
         print(self.question_script_order)
+        print("-------adjectives--------")
         print(self.adj_script_order)
+        print("--------adverbs----------")
+        print(self.adv_script_order)
         print("line_get, integer:")
         print(self.line_get)
+
+    def test_responses(self):
+        for script in self.scripts_list:
+            result = self.get_script_line(script)
+            string_result = str(result)
+            print(result)
 
     def run_wiwa(self):
         intro = """ Welcome to the whispering wall, Wiwa is here to respond
@@ -83,14 +109,25 @@ class Wiwa(object):
                 if choice[0] == 'noun':
                     response = self.get_script_line(self.nounscript)
                     print("Wiwa:")
-                    print(response % choice[1])
+                    if '%' in response:
+                        print(response % choice[1])
+                    else:
+                        print(response)
                 elif choice[0] =='verb':
                     response = self.get_script_line(self.verbscript)
                     print("Wiwa:")
-                    print(response % choice[1])
+                    if '%' in response:
+                        print(response % choice[1])
+                    else:
+                        print(response)
                 elif choice[0] == 'adv':
+                    response = self.get_script_line(self.adverbs)
                     print("Wiwa:")
-                    print(f"Can a turtle swim {choice[1]}?")
+                    if '%' in response:
+                        print(response % choice[1])
+                    else:
+                        print(response)
+
                 elif choice[0] == 'adj':
                     response = self.get_script_line(self.adjectives)
                     print("Wiwa:")
@@ -108,17 +145,30 @@ class Wiwa(object):
         """ Chooses a random script line to give back to user """
         # is often not random *sad face*
         #print(self.line_get)
+        order = None
+        for script in self.scripts_list:
+            if script == arg:
+                if arg.endswith('script1.txt'):
+                    order = self.noun_script_order
+                    break
+                elif arg.endswith('script4.txt'):
+                    order = self.question_script_order
+                    break
+                elif arg.endswith('script2.txt'):
+                    order = self.verb_script_order
+                    break
+                elif arg.endswith('script3.txt'):
+                    order = self.simple_script_order
+                    break
+                elif arg.endswith('script5.txt'):
+                    order = self.adj_script_order
+                    break
+                elif arg.endswith('script7.txt'):
+                    order = self.adv_script_order
+                    break
+            else:
+                pass
 
-        if arg == 'script1.txt':
-            order = self.noun_script_order
-        elif arg == 'script4.txt':
-            order = self.question_script_order
-        elif arg == 'script2.txt':
-            order = self.verb_script_order
-        elif arg == 'script3.txt':
-            order = self.simple_script_order
-        elif arg == 'script5.txt':
-            order = self.adj_script_order
         else:
             order = None
         if order != None:
@@ -133,7 +183,13 @@ class Wiwa(object):
                 return lines[x]
 
         else:
-            return "script file could not be found"
+            message = """
+            script file could not be located:
+            Original text file names should be one of the following:
+            script1.txt, script2.txt, script3.txt, script4.txt, script5.txt, script7.txt
+            """
+            print(message)
+            return None
 
     def pick_response(self, raw_input):
         """ Create lists of possible valid words for response mechanism,
@@ -165,7 +221,7 @@ class Wiwa(object):
                 options['adv'].append(item)
         if er > 0:
             words_found = True
-            for item in error:
+            for item in errors:
                 options['err'].append(item)
         done = False
         if words_found == True:
@@ -178,6 +234,7 @@ class Wiwa(object):
                     return choice_tup
         else:
             return ('error', 'not identified')
+
     def strip_stop_words(self, arg):
         stops = ['i','the', 'of', 'he', 'she', 'it', 'some', 'all', 'a', 'lot',
                 'have', 'about', 'been', 'to', 'too', 'from', 'an', 'at',
@@ -289,7 +346,7 @@ def create_script_line_order(somescript):
             raise ValueError
     else:
         print("***file is not a txt file***")
-        print("\t file=", somefile)
+        print("\t file=", somescript)
         raise ValueError
     if count != None:
         first_list = []
@@ -305,3 +362,12 @@ def create_script_line_order(somescript):
 
 new_wiwa = Wiwa()
 new_wiwa.run_wiwa()
+
+
+#########  tests #########
+#### check if filePaths are being created properly
+#new_wiwa.test_filePath()
+#### check that all self.attributes are being created successfully
+#new_wiwa.test_variables()
+#### check that responses are being generated from the files:
+#new_wiwa.test_responses()
