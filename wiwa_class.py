@@ -38,6 +38,7 @@ class Wiwa(object):
         self.simplescript = os.path.join(self.fileDirectory, 'script3.txt')
         self.questionable = os.path.join(self.fileDirectory, 'script4.txt')
         self.adjectives = os.path.join(self.fileDirectory, 'script5.txt')
+        self.errorscript = os.path.join(self.fileDirectory, 'script6.txt')
         self.adverbs = os.path.join(self.fileDirectory, 'script7.txt')
         self.dictionary = enchant.Dict("en_US")
         self.noun_script_order = create_script_line_order(self.nounscript)
@@ -45,8 +46,9 @@ class Wiwa(object):
         self.simple_script_order = create_script_line_order(self.simplescript)
         self.question_script_order = create_script_line_order(self.questionable)
         self.adj_script_order = create_script_line_order(self.adjectives)
+        self.err_script_order = create_script_line_order(self.errorscript)
         self.adv_script_order = create_script_line_order(self.adverbs)
-        self.scripts_list = [self.nounscript, self.verbscript, self.simplescript, self.questionable, self.adjectives, self.adverbs]
+        self.scripts_list = [self.nounscript, self.verbscript, self.simplescript, self.questionable, self.adjectives, self.errorscript, self.adverbs]
         self.line_get = 0
 
     def test_filePath(self):
@@ -72,6 +74,8 @@ class Wiwa(object):
         print(self.question_script_order)
         print("-------adjectives--------")
         print(self.adj_script_order)
+        print("------  errors  ---------")
+        print(self.err_script_order)
         print("--------adverbs----------")
         print(self.adv_script_order)
         print("line_get, integer:")
@@ -135,9 +139,18 @@ class Wiwa(object):
                         print(response % choice[1])
                     else:
                         print(response)
-                else:
 
+                elif choice[0] == 'err':
+                    response = self.get_script_line(self.errorscript)
+                    print("Wiwa:")
+                    if '%' in response:
+                        print(response % choice[1])
+                    else:
+                        print(response)
+
+                else:
                     print("Wiwa:  ... ... ")
+
             make = input("...>>")
 
 
@@ -151,13 +164,13 @@ class Wiwa(object):
                 if arg.endswith('script1.txt'):
                     order = self.noun_script_order
                     break
-                elif arg.endswith('script4.txt'):
+                elif arg.endswith('script2.txt'):
                     order = self.question_script_order
                     break
-                elif arg.endswith('script2.txt'):
+                elif arg.endswith('script3.txt'):
                     order = self.verb_script_order
                     break
-                elif arg.endswith('script3.txt'):
+                elif arg.endswith('script4.txt'):
                     order = self.simple_script_order
                     break
                 elif arg.endswith('script5.txt'):
@@ -165,6 +178,9 @@ class Wiwa(object):
                     break
                 elif arg.endswith('script7.txt'):
                     order = self.adv_script_order
+                    break
+                elif arg.endswith('script6.txt'):
+                    order = self.err_script_order
                     break
             else:
                 pass
@@ -186,7 +202,8 @@ class Wiwa(object):
             message = """
             script file could not be located:
             Original text file names should be one of the following:
-            script1.txt, script2.txt, script3.txt, script4.txt, script5.txt, script7.txt
+            script1.txt, script2.txt, script3.txt, script4.txt, script5.txt, script6.txt
+            or script7.txt
             """
             print(message)
             return None
@@ -271,7 +288,6 @@ class Wiwa(object):
         verbs = []
         adj = []
         adv = []
-        errors = []
         for item in clean_tags:
             x = item[1]
             #print(item)
