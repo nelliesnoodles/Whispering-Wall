@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import sys
 import re
-import enchant
+#import enchant  #Remove enchant for windows, will not install easily
 from nltk.corpus import wordnet
 import nltk as nltk
 import random
@@ -16,7 +16,9 @@ import os
       Manual setup:
       install - nltk
       install - python3
-      install - PyEnchant
+      install - PyEnchant (Windows 10 fails to load pyEnchant)
+      *  if you can't use pyenchant, there is a nltk function to check words *
+      Areas where enchant is removed are marked with ## !!!!!!!! lines
       In your python3 shell type these to download needed data sets:
       >>>import nltk
       >>>nltk.download('wordnet')
@@ -31,8 +33,7 @@ import os
 
 class Wiwa(object):
     def __init__(self):
-        self.fileDirectory = os.path.realpath(
-    os.path.join(os.getcwd(), os.path.dirname(__file__)))
+        self.fileDirectory = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
         self.nounscript = os.path.join(self.fileDirectory, 'script1.txt')
         self.verbscript = os.path.join(self.fileDirectory, 'script2.txt')
         self.simplescript = os.path.join(self.fileDirectory, 'script3.txt')
@@ -40,7 +41,18 @@ class Wiwa(object):
         self.adjectives = os.path.join(self.fileDirectory, 'script5.txt')
         self.errorscript = os.path.join(self.fileDirectory, 'script6.txt')
         self.adverbs = os.path.join(self.fileDirectory, 'script7.txt')
-        self.dictionary = enchant.Dict("en_US")
+        ## NEW--
+        self.aboutNellie = os.path.join(self.fileDirectory, 'script8.txt')
+        self.about_index = 0
+        self.about_list = []
+        self.aboutWiwa = os.path.join(self.fileDirectory, 'script9.txt')
+        self.about_W_index = 0
+        self.about_W_list = []
+        ## -----
+## !!!!!!!!! ----
+        #self.dictionary = enchant.Dict("en_US") #<-- Removed for windows
+## !!!!!!!  ----
+
         self.noun_script_order = create_script_line_order(self.nounscript)
         self.verb_script_order = create_script_line_order(self.verbscript)
         self.simple_script_order = create_script_line_order(self.simplescript)
@@ -93,6 +105,8 @@ class Wiwa(object):
         will respond according to her script.
         If you wish to stop program, type EXIT or QUIT.
         Have fun! """
+        self.about_list = self.create_about_list()
+        self.about_W_list = self.create_about_W_list()
         print(intro)
         make = input("..>>")
         while make not in ['EXIT', 'QUIT']:
@@ -100,7 +114,17 @@ class Wiwa(object):
             choice = self.pick_response(make)
             #print(choice)
             question = self.check_question(make)
-            if question:
+            about_me = self.check_for_name(make)
+            about_wiwa = self.check_for_name_wiwa(make)
+            if about_me != False:
+                print("Wiwa:")
+                response = self.get_about_line()
+                print(response)
+            elif about_wiwa != False:
+                print("Wiwa:")
+                response = self.get_about_W_line()
+                print(response)
+            elif question:
                 # Maybe use simple script for these too?
                 print("Wiwa:")
                 discusanswer = self.get_script_line(self.questionable)
@@ -153,7 +177,113 @@ class Wiwa(object):
 
             make = input("...>>")
 
+    ## NEW ---------
+    def create_about_list(self):
+        """
+        Get the lines in the text file to respond when input includes creator's name
+        """
+        about_list = []
+        try:
+            with open(self.aboutNellie) as f:
+                lines = f.readlines()
 
+                for line in lines:
+                    #print(line)
+                    self.about_list.append(line)
+        except:
+            print(f"file at : {self.aboutNellie} could not be opened.")
+
+        finally:
+            return self.about_list
+
+    def create_about_W_list(self):
+        """
+        Get lines from script9 for input that includes reference to Wiwa.
+        """
+        about_list = []
+        try:
+            with open(self.aboutWiwa) as f:
+                lines = f.readlines()
+
+                for line in lines:
+                    #print(line)
+                    self.about_W_list.append(line)
+        except:
+            print(f"file at : {self.aboutWiwa} could not be opened.")
+
+        finally:
+            return self.about_W_list
+
+    def get_about_line(self):
+        """
+        The about Nellie script is supposed to go in order.
+        It is not randomized and responses are only dependant on the
+        user refering to the words 'nellie', 'tobey' or 'creator' in an input.
+        script lines are to be put in a list, and incremented through.
+        Once the end of the list is reached, we start over.
+        """
+        max = len(self.about_list) - 1
+        if self.about_index > max:
+            self.about_index = 0
+
+        line = self.about_list[self.about_index]
+        self.about_index += 1
+        return line
+
+    def get_about_W_line(self):
+        """
+        The about Wiwa script is supposed to go in order.
+        It is not randomized and responses are only dependant on the
+        user refering to the words 'wiwa', 'you' in an input.
+        script lines are to be put in a list, and incremented through.
+        Once the end of the list is reached, we start over.
+        """
+        max = len(self.about_W_list) - 1
+        if self.about_W_index > max:
+            self.about_W_index = 0
+
+        line = self.about_W_list[self.about_W_index]
+        self.about_W_index += 1
+        return line
+
+    def check_for_name(self, arg):
+        """
+        check the user input for key words that trigger the about
+        me script.  script8.txt.
+        """
+        if len(arg) == 0:
+            return "I'm just a wall, you can talk to me."
+        else:
+            arg = arg.lower()
+            me = ['nellie', 'creator', 'tobey']
+            found = False
+            for item in me:
+                if item in arg:
+                    #self.get_about_line()
+                    found = True
+                else:
+                    pass
+            return found
+
+    def check_for_name_wiwa(self, arg):
+        """
+        check the user input for key words that trigger the about
+        Wiwa script.  script9.txt.
+        """
+        if len(arg) == 0:
+            return "I'm just a wall, you can talk to me."
+        else:
+            arg = arg.lower()
+            me = ['wiwa', 'you', 'your']
+            found = False
+            for item in me:
+                if item in arg:
+                    #self.get_about_line()
+                    found = True
+                else:
+                    pass
+            return found
+    ## END NEW -----
     def get_script_line(self, arg):
         """ Chooses a random script line to give back to user """
         # is often not random *sad face*
@@ -254,7 +384,7 @@ class Wiwa(object):
 
     def strip_stop_words(self, arg):
         stops = ['i','the', 'of', 'he', 'she', 'it', 'some', 'all', 'a', 'lot',
-                'have', 'about', 'been', 'to', 'too', 'from', 'an', 'at',
+                'have', 'about', 'been', 'to', 'too', 'from', 'an', 'at', 'do', 'go'
                 'above', 'before', 'across', 'against', 'almost', 'along', 'aslo',
                 'although', 'always', 'am', 'among', 'amongst', 'amount', 'and',
                 'another', 'any', 'anyhow', 'anyone', 'anything', 'around', 'as',
@@ -279,7 +409,10 @@ class Wiwa(object):
     def make_tag_lists(self, arg):
         """ Use nltk to tag words for Wiwa to recycle and or respond too """
         # Now that this is working I'll have to make her an adjective and adverb script!
-        errors = self.check_errors(arg)
+        # replace check_errors with check_errors_W for windows users
+## !!!!!!!!!!!!!
+        errors = self.check_errors_W(arg)
+## !!!!!!!!!!!!
         tokens = nltk.word_tokenize(arg)
         tags = nltk.pos_tag(tokens)
         clean_tags = self.remove_bad_tags(tags)
@@ -316,15 +449,26 @@ class Wiwa(object):
             else:
                 errors.append(item)
         return errors
-
+    ## NEW --- for windows users:
+    def check_errors_W(self, arg):
+        errors = []
+        for item in arg:
+            if wordnet.synsets(arg):
+                pass
+            else:
+                errors.append(item)
+        return errors
+    ### end validating word with wordnet
 
     def remove_bad_tags(self, tags_list):
         """ Use pyEnchant to remove unidentifiable words from tags list"""
         new_tags = []
         for item in tags_list:
             word = item[0]
-
-            if self.enchant_check(word):
+## !!!!!!!!!!    windows vs non-windows change   !!!!!#
+            # !!!   Use enchant_check_W for windows  !!!
+            # !!!   enchant_check for non-windows    !!!
+            if self.enchant_check_W(word):
                 new_tags.append(item)
             else:
                 pass
@@ -336,6 +480,15 @@ class Wiwa(object):
         """ using the PyEnchant English dictionary to check validity of a word."""
         x = self.dictionary.check(arg)
         return x
+    ###  NEW check validity check for Windows:
+    def enchant_check_W(self, arg):
+
+        if wordnet.synsets(arg):
+            return True
+        else:
+            return False
+    ####  END NEW validity check for Windows
+
 
     def check_question(self, arg):
         questions = ['why', '?']
