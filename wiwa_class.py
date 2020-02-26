@@ -108,22 +108,29 @@ class Wiwa(object):
         self.about_list = self.create_about_list()
         self.about_W_list = self.create_about_W_list()
         print(intro)
+        
         make = input("..>>")
         while make not in ['EXIT', 'QUIT']:
+            stripped = make.lower()
+            make = re.sub("[^a-zA-Z| |]+", "", stripped)
 
             choice = self.pick_response(make)
             #print(choice)
             question = self.check_question(make)
             about_me = self.check_for_name(make)
             about_wiwa = self.check_for_name_wiwa(make)
-            if about_me != False:
+            greet = self.is_greeting(make)
+            if greet:
+                print("Wiwa: Greetings human!")
+
+
+
+            elif about_me != False:
                 print("Wiwa:")
                 response = self.get_about_line()
                 print(response)
-            elif about_wiwa != False:
-                print("Wiwa:")
-                response = self.get_about_W_line()
-                print(response)
+
+
             elif question:
                 # Maybe use simple script for these too?
                 print("Wiwa:")
@@ -172,12 +179,40 @@ class Wiwa(object):
                     else:
                         print(response)
 
+                elif about_wiwa != False:
+                    print("Wiwa:")
+                    response = self.get_about_W_line()
+                    print(response)
+
                 else:
                     print("Wiwa:  ... ... ")
 
             make = input("...>>")
 
-    ## NEW ---------
+    ## NEW Greetings---
+
+    def is_greeting(self, user_input):
+        greetings = [
+        'hiya', 'howdy', 'hello', 'greetings',
+        'aloha', 'yo', 'salutations', 'hi'
+        ]
+        if len(user_input) == 0:
+            return True
+
+        else:
+            if type(user_input) == str:
+                alist = user_input.split()
+                for word in alist:
+                    if word in greetings:
+                        return True
+                    else:
+                        pass
+        return False
+
+
+
+
+
     def create_about_list(self):
         """
         Get the lines in the text file to respond when input includes creator's name
@@ -343,6 +378,11 @@ class Wiwa(object):
             Then uses random to choose one to send back to run_wiwa() """
         make = raw_input.lower()
         nouns, verbs, adj, adv, errors = self.make_tag_lists(make)
+        print("nouns=", nouns)
+        print("verbs=", verbs)
+        print("adj=", adj)
+        print("adv=", adv)
+        print("errors=", errors)
         n = len(nouns)
         v = len(verbs)
         aj = len(adj)
@@ -375,6 +415,8 @@ class Wiwa(object):
             while not done:
                 word_type = random.choice(list(options.keys()))
                 word_list = options[word_type]
+                #print("word_type=", word_type)
+                #print("word_list[0]=", options[word_type])
                 if len(word_list) > 0:
                     choice_tup = (word_type, word_list[0])
                     done = True
@@ -383,9 +425,15 @@ class Wiwa(object):
             return ('error', 'not identified')
 
     def strip_stop_words(self, arg):
-        stops = ['i','the', 'of', 'he', 'she', 'it', 'some', 'all', 'a', 'lot',
+        """
+        arg is passed in as a list, and as a string.
+        Once while checking for errors as a string, and once again
+        as a list when removing stop words from the list.
+        """
+
+        stops = [' ', 'i','the', 'of', 'he', 'she', 'it', 'some', 'all', 'a', 'lot',
                 'have', 'about', 'been', 'to', 'too', 'from', 'an', 'at', 'do', 'go'
-                'above', 'before', 'across', 'against', 'almost', 'along', 'aslo',
+                'above', 'are', 'before', 'across', 'against', 'almost', 'along', 'aslo',
                 'although', 'always', 'am', 'among', 'amongst', 'amount', 'and',
                 'another', 'any', 'anyhow', 'anyone', 'anything', 'around', 'as',
                 'be', 'maybe', 'being', 'beside', 'besides', 'between', 'beyond', 'both',
@@ -398,51 +446,88 @@ class Wiwa(object):
                 'there', 'these', 'they', 'though', 'thru', 'too', 'under', 'until',
                 'upon', 'very', 'was', 'were' 'which', 'while', 'will', 'with', 'ill', 'lets']
         new_arg = []
-        for item in arg:
-            if item in stops:
-                pass
-            else:
-                new_arg.append(item)
-        #print(new_arg)
+
+        if type(arg) == str:
+            arg = arg.split()
+            for item in arg:
+                if item in stops:
+                    pass
+                else:
+                    new_arg.append(item)
+
+
+
+        elif type(arg) == list:
+            i = 0
+            for item in arg:
+                word = arg[i]
+                if word in stops:
+                    pass
+                else:
+                    new_arg.append(word)
+                i += 1
+
+
+        else:
+            new_arg = ['ERRORinSTOPwordSTRIP']
+
         return new_arg
+
 
     def make_tag_lists(self, arg):
         """ Use nltk to tag words for Wiwa to recycle and or respond too """
-        # Now that this is working I'll have to make her an adjective and adverb script!
-        # replace check_errors with check_errors_W for windows users
+
 ## !!!!!!!!!!!!!
+
         errors = self.check_errors_W(arg)
+
 ## !!!!!!!!!!!!
         tokens = nltk.word_tokenize(arg)
         tags = nltk.pos_tag(tokens)
+
+        print("tags=", tags)
         clean_tags = self.remove_bad_tags(tags)
-        #print("cleaned tags=", clean_tags)
+        print("cleaned tags=", clean_tags)
         nouns = []
         verbs = []
         adj = []
         adv = []
-        for item in clean_tags:
-            x = item[1]
-            #print(item)
-            if x.startswith("VB"):
-                verbs.append(item[0])
-            elif x.startswith("NN"):
-                nouns.append(item[0])
-            elif x.startswith("JJ"):
-                adj.append(item[0])
-            elif x.startswith("RB"):
-                adv.append(item[0])
-            else:
-                pass
-        nouns = self.strip_stop_words(nouns)
-        verbs = self.strip_stop_words(verbs)
-        adj = self.strip_stop_words(adj)
-        adv = self.strip_stop_words(adv)
-        return nouns, verbs, adj, adv, errors
+        #print('clean_tags =', clean_tags)
+        #!!!! if someone enters unfindable text, clean_tags will be empty !!!!
+        if len(clean_tags) > 0:
+            for item in clean_tags:
+                x = item[1]
+                #print(item)
+                if x.startswith("V"):
+                    verbs.append(item[0])
+                elif x.startswith("NN"):
+                    nouns.append(item[0])
+                elif x.startswith("JJ"):
+                    adj.append(item[0])
+                elif x.startswith("RB"):
+                    adv.append(item[0])
+                else:
+                    pass
+            nouns = self.strip_stop_words(nouns)
+            verbs = self.strip_stop_words(verbs)
+            adj = self.strip_stop_words(adj)
+            adv = self.strip_stop_words(adv)
+            return nouns, verbs, adj, adv, errors
+        else:
+            nouns = []
+            verbs = []
+            adj = []
+            adv = []
+            return nouns, verbs, adj, adv, errors
+
 
     def check_errors(self, arg):
-        """ Make a list of words that are not found with pyEnchant"""
+        """
+        Make a list of words that are not found with pyEnchant,
+        Currently using NLTK in wiwa online.  This is an optional way.
+        """
         errors = []
+        #print("arg =", arg)
         for item in arg:
             if self.enchant_check(arg):
                 pass
@@ -451,9 +536,19 @@ class Wiwa(object):
         return errors
     ## NEW --- for windows users:
     def check_errors_W(self, arg):
+        """
+        arg is the user's input.  Must be split into words.
+        """
         errors = []
-        for item in arg:
-            if wordnet.synsets(arg):
+
+        print('arg type in check_errors_W=', type(arg))
+        stripped = self.strip_stop_words(arg)
+        user_words = stripped
+        print("user_words = ", user_words)
+
+
+        for item in user_words:
+            if wordnet.synsets(item):
                 pass
             else:
                 errors.append(item)
