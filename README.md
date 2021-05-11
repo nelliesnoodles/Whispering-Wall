@@ -7,6 +7,14 @@ Testing and methods are tried out on this code before being implemented on the o
 
 A setup.py file, If you already have python3.6 and your virtual environment activated will install what you need to run her.
 
+5/11/2021 
+
+Wiwa's code has a list of hateful words (slurs) she will not parse.  
+I will add more words as I am informed of them.  
+I do not want my chatbot engaging in conversation where these words are used. 
+If you have words you think I should add, you can DM my twitter account and let me know.
+[twitter: NelliesNoodles](https://twitter.com/NelliesNoodles)
+
 TO-DO  
 
 * eliminate need for sys.argv when getting script.txt (Done. 2-11-19)
