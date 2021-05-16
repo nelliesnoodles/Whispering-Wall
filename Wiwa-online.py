@@ -3,9 +3,10 @@
 
 import enchant
 import re
+import nltk as nltk
 from nltk.corpus import wordnet
 import random
-import nltk as nltk
+
 
 
 
@@ -82,25 +83,28 @@ class Wiwa(object):
         make = user_input
         stripped = make.lower()
         newstring = re.sub("[^a-zA-Z| |]+", "", stripped)
-        self.about_list = self.create_about_list()
-        self.about_W_list = self.create_about_W_list()
+        self.create_about_list()
+        self.create_about_W_list()
 
         if make in ['QUIT', 'EXIT', 'exit', 'quit', 'q']:
             self.about_index = 0
             self.about_W_index = 0
             return "Goodbye, thanks for stopping in!"
         else:
-            choice = self.pick_response(make)
+
 
             reject = self.unacceptable(make)
             question = self.check_question(make)
             about_me = self.check_for_name(make)
             about_wiwa = self.check_for_name_wiwa(make)
             greet = self.is_greeting(make)
+
+
             if reject:
                 response = "That language is not acceptable here."
                 return response
-            if about_me != False:
+
+            elif about_me != False:
                 response = self.get_about_line()
                 return response
 
@@ -116,6 +120,7 @@ class Wiwa(object):
                 return response
 
             else:
+                choice = self.pick_response(make)
                 if choice[0] == 'noun':
                     response = self.get_script_line(self.nounscript)
                     return response.format(choice[1])
@@ -155,8 +160,9 @@ class Wiwa(object):
 
                 else:
 
-
-                    return("  ... ... ")
+                    intro = """Welcome to the Whispering Wall, Wiwa is here to give you an outlet for your words.
+                    She is just a program, and will respond according to her script. It's slightly better than talking to a literal wall. """
+                    return(intro)
 
 ##---------------------------------##
 ##    modified for test main run   ##
@@ -242,7 +248,7 @@ class Wiwa(object):
 
 ##----------------------------------------------------##
 ##    Creating a filter for words that shall not      ##
-## be accepted or processed by Wiwa.  She thinks      ##
+## be accepted or processed by Wiwa.                  ##
 ## This language is not acceptable.                   ##
 ## If I missed any feel free to let me know, I will   ##
 ## add it to her doNOTPARSE list.                     ##
@@ -252,8 +258,10 @@ class Wiwa(object):
         stripped = astring.lower()
         newstring = re.sub("[^a-zA-Z| |]+", "", stripped)
         checking_list = newstring.split(' ')
-        print(checking_list)
-        doNOTPARSE = ['cunt', 'whore', 'chink', 'bootlip', 'coon', 'nigger', 'niger', 'niglet', 'slut', 'retard', 'retarded']
+        #print(checking_list)
+        doNOTPARSE = [
+            'cunt', 'whore', 'chink', 'bootlip', 'coon', 'nigger', 'niger', 'niglet', 'slut',
+             'retard', 'retarded']
         for word in checking_list:
             if word in doNOTPARSE:
                 return True
@@ -477,17 +485,18 @@ class Wiwa(object):
         stops = [' ', 'i','the', 'of', 'he', 'she', 'it', 'some', 'all', 'a', 'lot',
                 'have', 'about', 'been', 'to', 'too', 'from', 'an', 'at', 'do', 'go'
                 'above', 'are', 'before', 'across', 'against', 'almost', 'along', 'aslo',
-                'although', 'always', 'am', 'among', 'amongst', 'amount', 'and',
+                'although', 'again', 'always', 'am', 'among', 'amongst', 'amount', 'and',
                 'another', 'any', 'anyhow', 'anyone', 'anything', 'around', 'as',
                 'be', 'maybe', 'being', 'beside', 'besides', 'between', 'beyond', 'both',
                 'but', 'by', 'can', 'could', 'done', 'during', 'each', 'either',
                 'else', 'even', 'every', 'everyone', 'everything', 'everywhere',
                 'except', 'few', 'for', 'had', 'has', 'hence', 'here', 'in', 'into', 'is',
-                'it', 'its', 'keep', 'last', 'latter', 'many', 'may', 'more', 'most',
+                'it', 'its', 'keep', 'last', 'latter', 'many', 'may', 'more', 'most', "n't",
                 'much', 'name', 'next', 'none', 'not', 'nothing', 'now', 'nowhere',
                 'often', 'other', 'others', 'over', 'rather', 'perhaps', 'seems', 'then',
                 'there', 'these', 'they', 'though', 'thru', 'too', 'under', 'until',
-                'upon', 'very', 'was', 'were' 'which', 'while', 'will', 'with', 'ill', 'lets']
+                'upon', 'very', 'was', 'were' 'which', 'while', 'will', 'with', 'ill', 'lets'
+                'wo', 'would', 'b', 'c', 'd', 'e', 'f', 'g', 'x', 'y', 'z']
         new_arg = []
 
         if type(arg) == str:
@@ -584,13 +593,13 @@ class Wiwa(object):
         for script in scripts:
             try:
                 with open(script) as f:
-                    print('SUCCESS')
-                    print('script index: ', index)
+                    #print('SUCCESS')
+                    #print('script index: ', index)
                     index += 1
             except:
                 message = "unable to open file at index {} in scripts of test_attributes"
                 error_message = message.format(index)
-                print(error_message)
+                #print(error_message)
                 index += 1
 
         index = 0
@@ -599,7 +608,7 @@ class Wiwa(object):
             if result == "script file could not be found":
                 message = "unable to open file at index {} in scripts of test_attributes"
                 error_message = message.format(index)
-                print(error_message)
+                #print(error_message)
                 index += 1
             else:
                 print('get line success @ :', index)
@@ -649,24 +658,11 @@ def WW_test():
             index += 1
 
 def newtest():
-    test_sentences = [
-        "Where are the goats?", #questionable.txt
-        "The goats are jumping", #Noun, verb
-        "The frog jumped.", #noun, verb
-        "No", #simpleScript.txt
-        "Tree.", #Noun
-        "Kill it", # Verb
-        "Pretty Octopus.", #Adjective
-        "Edible button.", #adjective
-        "Beautifully done.", #adverb
-        "It is simply magnificent.", #adverb
-        "fjskdflskjdflsjjslkfj", #error script
-        ]
+
     WW = Wiwa()
     try:
         WW.run_wiwa('new word')
         print('wiwa did not fail')
     except:
         print('wiwa failed to run.')
-
 
