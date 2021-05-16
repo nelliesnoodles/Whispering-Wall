@@ -9,7 +9,7 @@ On building the initial code, I realized that it would be much more responsive t
 This way the bot could capture and feed back the users word in dialog.  
 Example:  
 <div style="display: flex; width: 100%;">
-![Screenshot, User input: I have a dog.  Wiwa ouput: May I see dog?](image/path/wiwa.jpg)
+<img src="https://github.com/nelliesnoodles/Whispering-Wall/blob/master/Wiwa_5-16-2021.JPG" alt="Screenshot, User input: I have a dog.  Wiwa ouput: May I see dog?"></img>
 </div>
 
 In the example, the NLTK has parsed the initial user text, and found the word 'dog' and labeled it correctly as a Noun.
