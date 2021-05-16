@@ -253,7 +253,7 @@ class Wiwa(object):
         newstring = re.sub("[^a-zA-Z| |]+", "", stripped)
         checking_list = newstring.split(' ')
         print(checking_list)
-        doNOTPARSE = ['cunt', 'whore', 'chink', 'bootlip', 'coon', 'nigger', 'niger', 'niglet', 'slut', 'redneck']
+        doNOTPARSE = ['cunt', 'whore', 'chink', 'bootlip', 'coon', 'nigger', 'niger', 'niglet', 'slut', 'retard', 'retarded']
         for word in checking_list:
             if word in doNOTPARSE:
                 return True
