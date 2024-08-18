@@ -26,6 +26,8 @@ import random
     >>>nltk.download('wordnet')
     >>>nltk.download('punkt')
     >>>nltk.download('averaged_perceptron_tagger')
+
+    Each script has at least 22 lines of text to feed back to Whispering Wall (Wiwa for short)
     noun responses -- nouns.txt
     verb responses -- verbs.txt
     yes responses -- yes_no.txt
@@ -43,21 +45,16 @@ import random
 
 
 class Wiwa(object):
-    def __init__(self): # added a initiated value for session to access (line_numb) 1-9-18
-      #Personal CPU path: /home/nellie/MYSITE/my-first-blog-master/wiwa
-      #Website path to files:"/home/NelliesNoodles/nelliesnoodles_mysite/WIWA"
-      # script file path is also in the  ~~~~~get_script_line()~~~~~
-
-
-        self.nounscript = "/home/NelliesNoodles/nelliesnoodles_mysite/WIWA/nouns.txt"
-        self.verbscript = "/home/NelliesNoodles/nelliesnoodles_mysite/WIWA/verbs.txt"
-        self.simplescript = "/home/NelliesNoodles/nelliesnoodles_mysite/WIWA/yes_no.txt"
-        self.questionable = "/home/NelliesNoodles/nelliesnoodles_mysite/WIWA/queries.txt"
-        self.adjectives = "/home/NelliesNoodles/nelliesnoodles_mysite/WIWA/adjectives.txt"
-        self.error_script ="/home/NelliesNoodles/nelliesnoodles_mysite/WIWA/to_err.txt"
-        self.adverbs = "/home/NelliesNoodles/nelliesnoodles_mysite/WIWA/adverbs.txt"
-        self.aboutNellie = "/home/NelliesNoodles/nelliesnoodles_mysite/WIWA/script8.txt"
-        self.aboutWiwa = "/home/NelliesNoodles/nelliesnoodles_mysite/WIWA/script9.txt"
+    def __init__(self): 
+        self.nounscript = "<your full path to the file>/nouns.txt"
+        self.verbscript = "<your full path to the file>/verbs.txt"
+        self.simplescript = "<your full path to the file>/yes_no.txt"
+        self.questionable = "<your full path to the file>/queries.txt"
+        self.adjectives = "<your full path to the file>/adjectives.txt"
+        self.error_script ="<your full path to the file>/to_err.txt"
+        self.adverbs = "<your full path to the file>/adverbs.txt"
+        self.aboutNellie = "<your full path to the file>/script8.txt"
+        self.aboutWiwa = "<your full path to the file>/script9.txt"
         self.about_index = 0
         self.about_list = []
         self.about_W_index = 0
@@ -456,7 +453,7 @@ class Wiwa(object):
         # is often not random *sad face*
         #print(self.line_get)
         #return "getting line"
-        if arg.startswith("/home/NelliesNoodles/nelliesnoodles_mysite/WIWA"):   ####   Script file path  ####
+        if arg.startswith("<your script path>:"):   ####   Script file path  ####
             if self.line_get > 22:
                 self.line_get = 0
             with open(arg) as f:
@@ -467,7 +464,7 @@ class Wiwa(object):
                 return lines[x]
 
         else:
-            return "script file could not be found"
+            return "script file could not be found, did you replace your personal path in get_script_line function?"
 
 ##  ------------------------------------------- ##
 ##        input processing, cleaning            ##
